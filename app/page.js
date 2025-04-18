@@ -64,7 +64,8 @@ export default function Home() {
   
   return (
     <main className="p-6 max-w-3xl mx-auto">
-      <h1 className="text-2xl font-bold mb-4">SmartPitch – AI Proposal Generator</h1>
+      <h1 className="text-2xl font-bold mb-4">NexopitchAI – Intelligent Proposal Generator</h1>
+
       <input
   type="text"
   value={clientName}
