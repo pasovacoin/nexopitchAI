@@ -1,103 +1,202 @@
-import Image from "next/image";
+'use client'
+import { marked } from 'marked'
+import { useState, useRef } from 'react'
+
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              app/page.js
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const [input, setInput] = useState('')
+  const [proposal, setProposal] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [clientName, setClientName] = useState('')
+  const [yourCompanyName, setYourCompanyName] = useState('')
+  const [customPrice, setCustomPrice] = useState('')
+  const [logo, setLogo] = useState(null)
+  const [logoPreview, setLogoPreview] = useState('')
+  const [senderName, setSenderName] = useState('')
+  const [senderEmail, setSenderEmail] = useState('')
+  const [senderPhone, setSenderPhone] = useState('')
+  const [senderWebsite, setSenderWebsite] = useState('')
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+  
+  const proposalRef = useRef(null)
+
+  const downloadPDF = async () => {
+    const element = proposalRef.current
+  
+    const html2pdf = (await import('html2pdf.js')).default
+  
+    html2pdf().from(element).set({
+      margin: 0.5,
+      filename: 'SmartPitch-Proposal.pdf',
+      html2canvas: { scale: 2 },
+      jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' },
+    }).save()
+  }
+  
+  const generateProposal = async () => {
+    setLoading(true)
+  
+    const company = yourCompanyName || 'Our Team'
+    const price = customPrice || '$5,000'
+  
+    const prompt = `
+  Create a business proposal for ${input} for ${clientName}.
+  Mention it's from ${company}.
+  Use a total price of ${price}.
+  
+  At the end, include this contact info:
+  Name: ${senderName}
+  Email: ${senderEmail}
+  Phone: ${senderPhone}
+  Website: ${senderWebsite || 'N/A'}
+    `
+  
+    const res = await fetch('/api/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompt }),
+    })
+  
+    const data = await res.json()
+    setProposal(data.proposal)
+    setLoading(false)
+  }
+  
+  return (
+    <main className="p-6 max-w-3xl mx-auto">
+      <h1 className="text-2xl font-bold mb-4">SmartPitch – AI Proposal Generator</h1>
+      <input
+  type="text"
+  value={clientName}
+  onChange={(e) => setClientName(e.target.value)}
+  placeholder="Enter client or company name"
+  className="w-full mb-4 p-3 border rounded"
+/>
+<input
+  type="text"
+  value={yourCompanyName}
+  onChange={(e) => setYourCompanyName(e.target.value)}
+  placeholder="Your Company Name"
+  className="w-full mb-4 p-3 border rounded"
+/>
+
+<input
+  type="text"
+  value={customPrice}
+  onChange={(e) => setCustomPrice(e.target.value)}
+  placeholder="Custom Price (e.g. $3,000)"
+  className="w-full mb-4 p-3 border rounded"
+/>
+<div className="mb-4">
+  <label className="block text-sm font-medium mb-1">Upload Logo</label>
+
+  <div className="flex items-center space-x-4">
+    <label className="px-4 py-2 bg-blue-600 text-white rounded cursor-pointer">
+      Choose File
+      <input
+        type="file"
+        accept="image/*"
+        className="hidden"
+        onChange={(e) => {
+          const file = e.target.files[0]
+          if (file) {
+            setLogo(file)
+            setLogoPreview(URL.createObjectURL(file))
+          }
+        }}
+      />
+    </label>
+
+    <span className="text-sm text-gray-600">
+      {logo ? logo.name : 'No file chosen'}
+    </span>
+  </div>
+</div>
+
+{logoPreview && (
+  <img
+    src={logoPreview}
+    alt="Uploaded Logo"
+    className="mb-4 h-20 object-contain"
+  />
+)}
+<input
+  type="text"
+  value={senderName}
+  onChange={(e) => setSenderName(e.target.value)}
+  placeholder="Your Name"
+  className="w-full mb-4 p-3 border rounded"
+/>
+
+<input
+  type="email"
+  value={senderEmail}
+  onChange={(e) => setSenderEmail(e.target.value)}
+  placeholder="Your Email"
+  className="w-full mb-4 p-3 border rounded"
+/>
+
+<input
+  type="tel"
+  value={senderPhone}
+  onChange={(e) => setSenderPhone(e.target.value)}
+  placeholder="Phone Number"
+  className="w-full mb-4 p-3 border rounded"
+/>
+
+<input
+  type="text"
+  value={senderWebsite}
+  onChange={(e) => setSenderWebsite(e.target.value)}
+  placeholder="Website (optional)"
+  className="w-full mb-4 p-3 border rounded"
+/>
+
+      <textarea
+        value={input}
+        onChange={(e) => setInput(e.target.value)}
+        placeholder="e.g. Proposal for social media marketing for a gym in LA"
+        className="w-full h-24 p-3 border rounded mb-4"
+      />
+
+      <button
+        onClick={generateProposal}
+        disabled={loading}
+        className="px-4 py-2 bg-blue-600 text-white rounded"
+      >
+        {loading ? 'Generating...' : 'Generate Proposal'}
+      </button>
+
+      {proposal && (
+  <>
+    <div ref={proposalRef} className="...">
+  {logoPreview && (
+    <img src={logoPreview} alt="Logo" className="h-16 mb-4" />
+  )}
+
+<pre className="whitespace-pre-wrap font-sans">{proposal}</pre>
+
+</div>
+
+
+
+    <div className="flex space-x-2 mt-4">
+      <button
+        onClick={downloadPDF}
+        className="px-4 py-2 bg-green-600 text-white rounded"
+      >
+        Download PDF
+      </button>
+      <button
+        onClick={generateProposal}
+        className="px-4 py-2 bg-gray-300 text-black rounded"
+      >
+        Regenerate
+      </button>
     </div>
-  );
+  </>
+)}
+
+    </main>
+  )
 }
