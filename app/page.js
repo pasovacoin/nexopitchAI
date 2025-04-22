@@ -1,6 +1,6 @@
 'use client'
 import { supabase } from '@/lib/supabaseClient' // Make sure this is at the top of page.js
-import { marked } from 'marked'
+
 import { useState, useRef } from 'react'
 
 
@@ -28,7 +28,7 @@ export default function Home() {
   
     html2pdf().from(element).set({
       margin: 0.5,
-      filename: 'SmartPitch-Proposal.pdf',
+      filename: 'NexopitchAI-Proposal.pdf',
       html2canvas: { scale: 2 },
       jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' },
     }).save()
@@ -62,7 +62,7 @@ export default function Home() {
   Phone: ${senderPhone}
   Website: ${senderWebsite || 'N/A'}
     `
-  
+
     const res = await fetch('/api/generate', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -79,43 +79,11 @@ export default function Home() {
   
     setLoading(false)
   }
-  const [email, setEmail] = useState('')
-const [message, setMessage] = useState('')
-
-const handleLogin = async (e) => {
-  e.preventDefault()
-  const { error } = await supabase.auth.signInWithOtp({ email })
-
-  if (error) {
-    setMessage('Login failed. Try again.')
-  } else {
-    setMessage('✅ Check your email for the magic link.')
-  }
-}
-
+  
   return (
     <main className="p-6 max-w-3xl mx-auto">
       <h1 className="text-2xl font-bold mb-4">NexopitchAI – Intelligent Proposal Generator</h1>
-      <form onSubmit={handleLogin} className="mt-8 max-w-md space-y-3">
-  <input
-    type="email"
-    value={email}
-    onChange={(e) => setEmail(e.target.value)}
-    placeholder="Enter your email to log in"
-    className="w-full p-2 border rounded"
-    required
-  />
-  <button
-    type="submit"
-    className="w-full px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-  >
-    Send Magic Link
-  </button>
 
-  {message && <p className="text-sm mt-2 text-gray-700">{message}</p>}
-</form>
-
-     
       <h2 className="text-xl font-semibold mb-2">Choose your plan</h2>
 
 <div className="flex flex-col gap-4 max-w-md">

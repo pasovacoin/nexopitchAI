@@ -1,9 +1,24 @@
 'use client'
 
+import { Auth } from '@supabase/auth-ui-react'
+import { ThemeSupa } from '@supabase/auth-ui-shared'
+import { supabase } from '@/lib/supabaseClient'
+
 export default function LoginPage() {
   return (
-    <main className="p-8">
-      <h1 className="text-3xl font-bold">This is the login page</h1>
-    </main>
+    <div className="flex justify-center items-center min-h-screen bg-gray-100">
+      <div className="max-w-md w-full p-6 bg-white shadow-md rounded">
+        <h1 className="text-2xl font-bold mb-4 text-center text-gray-800">
+          Welcome to NexopitchAI
+        </h1>
+        <Auth
+          supabaseClient={supabase}
+          appearance={{ theme: ThemeSupa }}
+          theme="light"
+          providers={['google']}
+          redirectTo="https://nexopitchai.morefestivals.com/dashboard"
+        />
+      </div>
+    </div>
   )
 }
