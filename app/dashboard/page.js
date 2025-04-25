@@ -18,13 +18,18 @@ export default function Dashboard() {
   const [senderPhone, setSenderPhone] = useState('')
   const [senderWebsite, setSenderWebsite] = useState('')
   const [credits, setCredits] = useState(0)
+
   const proposalRef = useRef(null)
 
   useEffect(() => {
     const fetchUser = async () => {
       const user = await supabase.auth.getUser()
       const email = user.data?.user?.email
-      const { data } = await supabase.from('users').select('credits').eq('email', email).single()
+      const { data } = await supabase
+        .from('users')
+        .select('credits')
+        .eq('email', email)
+        .single()
       setCredits(data?.credits || 0)
     }
     fetchUser()
@@ -59,9 +64,9 @@ export default function Dashboard() {
 
     const prompt = `
       Create a business proposal for ${input} for ${clientName}.
-      Mention it&apos;s from ${yourCompanyName || 'Our Team'}.
+      Mention it's from ${yourCompanyName || 'Our Team'}.
       Use a total price of ${customPrice || '$5,000'}.
-      
+
       At the end, include this contact info:
       Name: ${senderName}
       Email: ${senderEmail}
@@ -86,40 +91,56 @@ export default function Dashboard() {
   }
 
   return (
-    <main className="p-6 max-w-4xl mx-auto">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">Welcome back to NexopitchAI</h1>
-        <div className="flex gap-4 items-center">
+    <main className="max-w-2xl mx-auto px-4 sm:px-6 py-8 space-y-6">
+      <div className="flex justify-between items-center mb-4">
+        <h1 className="text-2xl font-bold">Welcome back to NexopitchAI</h1>
+        <div className="flex items-center gap-4">
           <span className="text-sm text-gray-600">Credits: {credits}</span>
-          <button onClick={logout} className="text-sm text-red-600 hover:underline">Logout</button>
+          <button onClick={logout} className="text-sm text-red-600 hover:underline">
+            Logout
+          </button>
         </div>
       </div>
 
-      <p className="text-gray-600 mb-6">Generate your next proposal in seconds with AI.</p>
+      <p className="text-gray-600 mb-4">
+        Generate your next proposal in seconds with AI.
+      </p>
 
-      <div className="bg-white p-6 rounded shadow-md space-y-4">
-        <input type="text" placeholder="Client / Project" value={clientName} onChange={e => setClientName(e.target.value)} className="w-full p-2 border rounded" />
-        <input type="text" placeholder="Your Company Name" value={yourCompanyName} onChange={e => setYourCompanyName(e.target.value)} className="w-full p-2 border rounded" />
-        <input type="text" placeholder="Custom Price (e.g. $3,000)" value={customPrice} onChange={e => setCustomPrice(e.target.value)} className="w-full p-2 border rounded" />
-        <input type="text" placeholder="Your Name" value={senderName} onChange={e => setSenderName(e.target.value)} className="w-full p-2 border rounded" />
-        <input type="email" placeholder="Your Email" value={senderEmail} onChange={e => setSenderEmail(e.target.value)} className="w-full p-2 border rounded" />
-        <input type="tel" placeholder="Phone Number" value={senderPhone} onChange={e => setSenderPhone(e.target.value)} className="w-full p-2 border rounded" />
-        <input type="text" placeholder="Website (optional)" value={senderWebsite} onChange={e => setSenderWebsite(e.target.value)} className="w-full p-2 border rounded" />
-        <textarea placeholder="Proposal details or prompt..." value={input} onChange={e => setInput(e.target.value)} className="w-full p-3 border rounded" />
+      <div className="bg-white dark:bg-gray-900 p-6 rounded shadow space-y-4">
+        <input type="text" placeholder="Client / Project" value={clientName} onChange={e => setClientName(e.target.value)} className="w-full p-3 border rounded bg-white dark:bg-gray-800 text-black dark:text-white" />
+        <input type="text" placeholder="Your Company Name" value={yourCompanyName} onChange={e => setYourCompanyName(e.target.value)} className="w-full p-3 border rounded bg-white dark:bg-gray-800 text-black dark:text-white" />
+        <input type="text" placeholder="Custom Price (e.g. $3,000)" value={customPrice} onChange={e => setCustomPrice(e.target.value)} className="w-full p-3 border rounded bg-white dark:bg-gray-800 text-black dark:text-white" />
+        <input type="text" placeholder="Your Name" value={senderName} onChange={e => setSenderName(e.target.value)} className="w-full p-3 border rounded bg-white dark:bg-gray-800 text-black dark:text-white" />
+        <input type="email" placeholder="Your Email" value={senderEmail} onChange={e => setSenderEmail(e.target.value)} className="w-full p-3 border rounded bg-white dark:bg-gray-800 text-black dark:text-white" />
+        <input type="tel" placeholder="Phone Number" value={senderPhone} onChange={e => setSenderPhone(e.target.value)} className="w-full p-3 border rounded bg-white dark:bg-gray-800 text-black dark:text-white" />
+        <input type="text" placeholder="Website (optional)" value={senderWebsite} onChange={e => setSenderWebsite(e.target.value)} className="w-full p-3 border rounded bg-white dark:bg-gray-800 text-black dark:text-white" />
+        <textarea placeholder="Proposal details or prompt..." value={input} onChange={e => setInput(e.target.value)} className="w-full p-3 border rounded bg-white dark:bg-gray-800 text-black dark:text-white" />
 
-        <button onClick={generateProposal} disabled={loading} className="w-full bg-blue-600 text-white py-2 rounded">
+        <button
+          onClick={generateProposal}
+          disabled={loading}
+          className="w-full px-4 py-2 text-white bg-primary-600 hover:bg-primary-700 dark:bg-primary-500 dark:hover:bg-primary-600 rounded"
+        >
           {loading ? 'Generating...' : 'Generate Proposal'}
         </button>
       </div>
 
       {proposal && (
-        <div className="mt-6 bg-gray-50 p-4 rounded border" ref={proposalRef}>
-          <pre className="whitespace-pre-wrap font-sans">{proposal}</pre>
+        <div className="bg-gray-100 dark:bg-gray-800 p-4 rounded border border-gray-300 dark:border-gray-700 mt-6" ref={proposalRef}>
+          <pre className="whitespace-pre-wrap font-sans text-black dark:text-white">{proposal}</pre>
           <div className="flex gap-4 mt-4">
-            <button onClick={downloadPDF} className="bg-green-600 text-white px-4 py-2 rounded">Download PDF</button>
+            <button onClick={downloadPDF} className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
+              Download PDF
+            </button>
           </div>
         </div>
       )}
+
+      <footer>
+        <p className="text-center text-sm text-secondary-600 dark:text-secondary-400 mt-10">
+          © {new Date().getFullYear()} NexopitchAI. All rights reserved.
+        </p>
+      </footer>
     </main>
   )
 }
