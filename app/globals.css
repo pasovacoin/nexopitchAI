@@ -2,19 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
-html, body {
-  max-width: 100vw;
-  overflow-x: hidden;
-}
-
 :root {
   --background: #ffffff;
   --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
@@ -29,9 +19,20 @@ html, body {
 body {
   background-color: var(--background);
   color: var(--foreground);
-  font-family: var(--font-geist-sans), sans-serif;
+  font-family: var(--font-sans), sans-serif;
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
+/* Prevent horizontal scrolling */
+html, body {
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+/* Optional: remove when not debugging layout */
+* {
+  box-sizing: border-box;
+  /* outline: 1px solid rgba(255, 0, 0, 0.2); */ /* Use only for debugging layout */
+}

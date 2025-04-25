@@ -98,11 +98,13 @@ export default function Home() {
 
   return (
     <>
-      <main className="p-6 max-w-3xl mx-auto text-black dark:text-white bg-white dark:bg-gray-900">
+      <main className="w-full max-w-3xl mx-auto px-4 sm:px-6">
+
         <h1 className="text-2xl font-bold mb-4">nexopitchAI – Intelligent Proposal Generator</h1>
         <h2 className="text-xl font-semibold mb-2">Choose your Plan</h2>
 
-        <div className="flex flex-col gap-4 max-w-md">
+        <div className="flex flex-wrap justify-between w-full">
+
           <a
   href="https://stratoelevate.lemonsqueezy.com/buy/dbc3b108-9065-4a48-9898-e93dd559bd39"
   className="px-4 py-2 bg-primary-600 hover:bg-primary-700 dark:bg-primary-500 dark:hover:bg-primary-600 text-white rounded text-center"
