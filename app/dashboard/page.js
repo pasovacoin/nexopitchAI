@@ -1,5 +1,7 @@
+/* eslint-disable react/no-unescaped-entities */
 'use client'
-import { useEffect, useState, useRef } from 'react'
+
+import { useState, useRef, useEffect } from 'react'
 import { supabase } from '@/lib/supabaseClient'
 
 export default function Dashboard() {
@@ -14,14 +16,17 @@ export default function Dashboard() {
   const [senderPhone, setSenderPhone] = useState('')
   const [senderWebsite, setSenderWebsite] = useState('')
   const [credits, setCredits] = useState(0)
-
   const proposalRef = useRef(null)
 
   useEffect(() => {
     const fetchUser = async () => {
       const user = await supabase.auth.getUser()
       const email = user.data?.user?.email
-      const { data } = await supabase.from('users').select('credits').eq('email', email).single()
+      const { data } = await supabase
+        .from('users')
+        .select('credits')
+        .eq('email', email)
+        .single()
       setCredits(data?.credits || 0)
     }
     fetchUser()
@@ -58,6 +63,8 @@ export default function Dashboard() {
       Create a business proposal for ${input} for ${clientName}.
       Mention it's from ${yourCompanyName || 'Our Team'}.
       Use a total price of ${customPrice || '$5,000'}.
+      
+      At the end, include this contact info:
       Name: ${senderName}
       Email: ${senderEmail}
       Phone: ${senderPhone}
@@ -71,71 +78,119 @@ export default function Dashboard() {
     })
 
     const data = await res.json()
-    if (res.ok) setProposal(data.proposal)
-    else alert(data.error || 'Something went wrong.')
-
+    if (res.ok) {
+      setProposal(data.proposal)
+    } else {
+      alert(data.error || 'Something went wrong.')
+    }
     setLoading(false)
   }
 
   return (
-    <main className="max-w-2xl mx-auto p-6 text-black dark:text-white">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-xl font-bold">NexopitchAI Dashboard</h1>
-        <div className="text-sm text-gray-600">Credits: {credits}</div>
-        <button onClick={logout} className="text-sm text-red-500 hover:underline">Logout</button>
+    <main className="max-w-3xl mx-auto px-4 py-8 space-y-6">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row justify-between items-center">
+        <h1 className="text-2xl font-bold text-primary-700">Dashboard</h1>
+        <div className="flex items-center gap-4 mt-4 sm:mt-0">
+          <span className="text-sm text-gray-600">Credits: {credits}</span>
+          <button
+            onClick={logout}
+            className="text-sm text-red-600 hover:underline"
+          >
+            Logout
+          </button>
+        </div>
       </div>
 
-      <div className="flex justify-between gap-4 text-sm mb-6">
-        <a href="https://stratoelevate.lemonsqueezy.com/buy/dbc3b108-9065-4a48-9898-e93dd559bd39" className="text-blue-600 hover:underline" target="_blank">Buy 10 Credits – $2</a>
-        <a href="https://stratoelevate.lemonsqueezy.com/buy/f299e4ec-511c-4a06-9bea-be5764b09a4d" className="text-blue-600 hover:underline" target="_blank">Go Unlimited – $6/Month</a>
-      </div>
-
-      <div className="space-y-4 bg-white dark:bg-gray-800 p-4 rounded shadow">
-        {[
-          { label: 'Client / Project', value: clientName, setter: setClientName },
-          { label: 'Your Company Name', value: yourCompanyName, setter: setYourCompanyName },
-          { label: 'Custom Price (e.g. $3,000)', value: customPrice, setter: setCustomPrice },
-          { label: 'Your Name', value: senderName, setter: setSenderName },
-          { label: 'Your Email', value: senderEmail, setter: setSenderEmail },
-          { label: 'Phone Number', value: senderPhone, setter: setSenderPhone },
-          { label: 'Website (optional)', value: senderWebsite, setter: setSenderWebsite },
-        ].map((item, index) => (
-          <input
-            key={index}
-            type="text"
-            placeholder={item.label}
-            value={item.value}
-            onChange={e => item.setter(e.target.value)}
-            className="w-full p-2 border rounded bg-white dark:bg-gray-700 text-black dark:text-white"
-          />
-        ))}
+      {/* Form */}
+      <div className="bg-white dark:bg-gray-900 shadow rounded p-6 space-y-4">
+        <input
+          type="text"
+          placeholder="Client / Project Name"
+          value={clientName}
+          onChange={e => setClientName(e.target.value)}
+          className="w-full p-3 border rounded bg-gray-50 dark:bg-gray-800 text-black dark:text-white"
+        />
+        <input
+          type="text"
+          placeholder="Your Company Name"
+          value={yourCompanyName}
+          onChange={e => setYourCompanyName(e.target.value)}
+          className="w-full p-3 border rounded bg-gray-50 dark:bg-gray-800 text-black dark:text-white"
+        />
+        <input
+          type="text"
+          placeholder="Custom Price (e.g. $5,000)"
+          value={customPrice}
+          onChange={e => setCustomPrice(e.target.value)}
+          className="w-full p-3 border rounded bg-gray-50 dark:bg-gray-800 text-black dark:text-white"
+        />
+        <input
+          type="text"
+          placeholder="Your Name"
+          value={senderName}
+          onChange={e => setSenderName(e.target.value)}
+          className="w-full p-3 border rounded bg-gray-50 dark:bg-gray-800 text-black dark:text-white"
+        />
+        <input
+          type="email"
+          placeholder="Your Email"
+          value={senderEmail}
+          onChange={e => setSenderEmail(e.target.value)}
+          className="w-full p-3 border rounded bg-gray-50 dark:bg-gray-800 text-black dark:text-white"
+        />
+        <input
+          type="tel"
+          placeholder="Phone Number"
+          value={senderPhone}
+          onChange={e => setSenderPhone(e.target.value)}
+          className="w-full p-3 border rounded bg-gray-50 dark:bg-gray-800 text-black dark:text-white"
+        />
+        <input
+          type="text"
+          placeholder="Website (optional)"
+          value={senderWebsite}
+          onChange={e => setSenderWebsite(e.target.value)}
+          className="w-full p-3 border rounded bg-gray-50 dark:bg-gray-800 text-black dark:text-white"
+        />
 
         <textarea
-          placeholder="Proposal prompt or service details..."
+          placeholder="Describe the project..."
           value={input}
           onChange={e => setInput(e.target.value)}
-          className="w-full p-2 border rounded h-24 bg-white dark:bg-gray-700 text-black dark:text-white"
+          className="w-full p-3 border rounded bg-gray-50 dark:bg-gray-800 text-black dark:text-white h-28"
         />
 
         <button
           onClick={generateProposal}
           disabled={loading}
-          className="w-full py-2 rounded bg-primary-600 hover:bg-primary-700 dark:bg-primary-500 dark:hover:bg-primary-600 text-white"
+          className="w-full bg-primary-600 hover:bg-primary-700 dark:bg-primary-500 dark:hover:bg-primary-600 text-white font-semibold py-3 rounded transition"
         >
           {loading ? 'Generating...' : 'Generate Proposal'}
         </button>
       </div>
 
+      {/* Output */}
       {proposal && (
-        <div className="mt-6 bg-gray-50 dark:bg-gray-800 p-4 rounded border" ref={proposalRef}>
-          <pre className="whitespace-pre-wrap text-black dark:text-white">{proposal}</pre>
-          <button onClick={downloadPDF} className="mt-4 w-full bg-green-600 hover:bg-green-700 text-white py-2 rounded">
-            Download PDF
+        <div
+          ref={proposalRef}
+          className="bg-gray-50 dark:bg-gray-800 p-6 rounded shadow space-y-4 mt-8"
+        >
+          <pre className="whitespace-pre-wrap font-sans text-black dark:text-white">
+            {proposal}
+          </pre>
+
+          <button
+            onClick={downloadPDF}
+            className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 rounded transition"
+          >
+            Download Proposal as PDF
           </button>
         </div>
       )}
 
-      <footer className="mt-10 text-center text-sm text-gray-500">
+      {/* Footer */}
+      <footer className="pt-10 text-center text-xs text-gray-400">
         © {new Date().getFullYear()} NexopitchAI. All rights reserved.
       </footer>
     </main>
