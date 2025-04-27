@@ -32,8 +32,8 @@ export default function SignupPage() {
 
   return (
     <main className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
-      <form
-        onSubmit={signup}
+      <form onSubmit={handleSignup}  // CORRECT ✅
+
         className="bg-white dark:bg-gray-800 p-8 rounded shadow-md w-full max-w-md space-y-6"
       >
         <h1 className="text-2xl font-bold text-center">Create your NexopitchAI account</h1>
