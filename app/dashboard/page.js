@@ -2,11 +2,8 @@
 
 import { useState, useRef, useEffect } from 'react'
 import { supabase } from '@/lib/supabaseClient'
-import { useRouter } from 'next/navigation'
 
 export default function Dashboard() {
-  const router = useRouter()
-
   const [input, setInput] = useState('')
   const [proposal, setProposal] = useState('')
   const [loading, setLoading] = useState(false)
@@ -17,31 +14,11 @@ export default function Dashboard() {
   const [senderEmail, setSenderEmail] = useState('')
   const [senderPhone, setSenderPhone] = useState('')
   const [senderWebsite, setSenderWebsite] = useState('')
-  const [credits, setCredits] = useState(0)
-
   const proposalRef = useRef(null)
-
-  useEffect(() => {
-    const fetchUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) {
-        router.push('/login')
-      } else {
-        const { data } = await supabase
-          .from('users')
-          .select('credits')
-          .eq('email', user.email)
-          .single()
-        setCredits(data?.credits || 0)
-        setSenderEmail(user.email)
-      }
-    }
-    fetchUser()
-  }, [router])
 
   const logout = async () => {
     await supabase.auth.signOut()
-    router.push('/login')
+    window.location.href = '/login'
   }
 
   const downloadPDF = async () => {
@@ -56,80 +33,95 @@ export default function Dashboard() {
   }
 
   const generateProposal = async () => {
-    if (!input || !senderEmail) {
-      alert('Missing project details or user.')
+    if (!input || !clientName) {
+      alert('Please fill in the required fields.')
       return
     }
+
     setLoading(true)
 
-    const prompt = `
-    Create a business proposal for ${input} for ${clientName}.
-    Mention it's from ${yourCompanyName || 'Our Team'}.
-    Use a total price of ${customPrice || '$5,000'}.
+    const user = await supabase.auth.getUser()
+    const userEmail = user.data?.user?.email
 
-    Contact info:
-    Name: ${senderName}
-    Email: ${senderEmail}
-    Phone: ${senderPhone}
-    Website: ${senderWebsite || 'N/A'}
+    if (!userEmail) {
+      alert('No user found, please log in again.')
+      setLoading(false)
+      return
+    }
+
+    const prompt = `
+Create a business proposal for ${clientName}.
+Project: ${input}
+From: ${yourCompanyName || 'NexopitchAI'}
+Price: ${customPrice || '$5,000'}
+Contact:
+- Name: ${senderName}
+- Email: ${senderEmail}
+- Phone: ${senderPhone}
+- Website: ${senderWebsite || 'N/A'}
     `
 
     const res = await fetch('/api/generate', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ prompt, userEmail: senderEmail }),
+      body: JSON.stringify({ prompt, userEmail }),
     })
 
     const data = await res.json()
+
     if (res.ok) {
       setProposal(data.proposal)
     } else {
       alert(data.error || 'Something went wrong.')
     }
+
     setLoading(false)
   }
 
   return (
-    <main className="max-w-3xl mx-auto p-6">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Welcome to NexopitchAI</h1>
-        <div className="flex gap-4 items-center">
-          <span className="text-gray-600 text-sm">Credits: {credits}</span>
-          <button onClick={logout} className="text-red-500 text-sm hover:underline">
-            Logout
-          </button>
+    <main className="min-h-screen bg-gray-50 dark:bg-gray-900 p-6 flex flex-col items-center">
+      <div className="w-full max-w-2xl bg-white dark:bg-gray-800 shadow-lg rounded-lg p-8">
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-2xl font-bold text-primary-700 dark:text-primary-400">Welcome to NexopitchAI</h1>
+          <button onClick={logout} className="text-sm text-red-600 hover:underline">Logout</button>
         </div>
-      </div>
 
-      <div className="bg-white dark:bg-gray-900 p-6 rounded shadow-md space-y-4">
-        <input className="w-full p-3 border rounded" value={clientName} onChange={e => setClientName(e.target.value)} placeholder="Client Name" />
-        <input className="w-full p-3 border rounded" value={yourCompanyName} onChange={e => setYourCompanyName(e.target.value)} placeholder="Your Company" />
-        <input className="w-full p-3 border rounded" value={customPrice} onChange={e => setCustomPrice(e.target.value)} placeholder="Custom Price ($)" />
-        <input className="w-full p-3 border rounded" value={senderName} onChange={e => setSenderName(e.target.value)} placeholder="Your Name" />
-        <input className="w-full p-3 border rounded" value={senderPhone} onChange={e => setSenderPhone(e.target.value)} placeholder="Phone" />
-        <input className="w-full p-3 border rounded" value={senderWebsite} onChange={e => setSenderWebsite(e.target.value)} placeholder="Website (optional)" />
-        <textarea className="w-full h-24 p-3 border rounded" value={input} onChange={e => setInput(e.target.value)} placeholder="Describe the project..." />
+        <p className="text-gray-600 dark:text-gray-400 mb-6">Create smart client proposals with AI. Instantly.</p>
+
+        <div className="grid gap-4 mb-6">
+          <input value={clientName} onChange={e => setClientName(e.target.value)} className="input" placeholder="Client / Company Name" />
+          <input value={yourCompanyName} onChange={e => setYourCompanyName(e.target.value)} className="input" placeholder="Your Company Name" />
+          <input value={customPrice} onChange={e => setCustomPrice(e.target.value)} className="input" placeholder="Custom Price (e.g. $3,000)" />
+          <input value={senderName} onChange={e => setSenderName(e.target.value)} className="input" placeholder="Your Name" />
+          <input value={senderEmail} onChange={e => setSenderEmail(e.target.value)} className="input" placeholder="Your Email" />
+          <input value={senderPhone} onChange={e => setSenderPhone(e.target.value)} className="input" placeholder="Your Phone" />
+          <input value={senderWebsite} onChange={e => setSenderWebsite(e.target.value)} className="input" placeholder="Website (optional)" />
+          <textarea value={input} onChange={e => setInput(e.target.value)} className="input" placeholder="Project Details..." rows="3" />
+        </div>
 
         <button
           onClick={generateProposal}
           disabled={loading}
-          className="w-full bg-primary-600 hover:bg-primary-700 text-white font-bold py-3 rounded"
+          className="w-full bg-primary-600 hover:bg-primary-700 text-white font-semibold py-3 rounded transition"
         >
           {loading ? 'Generating...' : 'Generate Proposal'}
         </button>
+
+        {proposal && (
+          <div ref={proposalRef} className="mt-6 p-4 bg-gray-100 dark:bg-gray-700 rounded shadow">
+            <pre className="whitespace-pre-wrap text-gray-800 dark:text-white">{proposal}</pre>
+            <div className="flex gap-4 mt-4">
+              <button onClick={downloadPDF} className="flex-1 bg-green-600 hover:bg-green-700 text-white py-2 rounded">
+                Download PDF
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
-      {proposal && (
-        <div ref={proposalRef} className="bg-gray-100 dark:bg-gray-800 p-6 rounded shadow-md mt-8">
-          <pre className="whitespace-pre-wrap">{proposal}</pre>
-          <button
-            onClick={downloadPDF}
-            className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 mt-4 rounded"
-          >
-            Download Proposal
-          </button>
-        </div>
-      )}
+      <footer className="mt-10 text-center text-sm text-gray-500 dark:text-gray-400">
+        © {new Date().getFullYear()} NexopitchAI. All rights reserved.
+      </footer>
     </main>
   )
 }
