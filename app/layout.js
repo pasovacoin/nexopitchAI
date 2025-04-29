@@ -29,7 +29,6 @@ export const metadata = {
       },
     ],
     type: 'website',
-    
   },
   twitter: {
     card: 'summary_large_image',
@@ -37,24 +36,21 @@ export const metadata = {
     description: 'Generate smart, professional proposals with AI in seconds.',
     images: ['/og-image.png'],
   },
-}
-
+};
 
 export default function RootLayout({ children }) {
   return (
     <html lang="en" className="dark">
       <head>
-      <title>NexopitchAI – Smart Proposals</title>
-      <meta name="theme-color" content="#25a2eb" />
-      <link rel="icon" href="/favicon.ico" />
+        <meta name="theme-color" content="#25a2eb" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="icon" href="/favicon.ico" />
         <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
         <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
         <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
-        <link rel="manifest" href="/site.webmanifest" />
-        </head>
-      <body>{children}</body>
+        <link rel="manifest" href="/manifest.json" />
+      </head>
+      <body className={`${geistSans.variable} ${geistMono.variable}`}>{children}</body>
     </html>
   );
 }
-
