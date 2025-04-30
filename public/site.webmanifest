@@ -4,8 +4,8 @@
     "start_url": "/",
     "display": "standalone",
     "orientation": "portrait",
-    "theme_color": "#25a2eb",
     "background_color": "#ffffff",
+    "theme_color": "#25a2eb",
     "description": "Generate high-quality business proposals in seconds using AI.",
     "icons": [
       {
@@ -17,6 +17,28 @@
         "src": "/icon-512.png",
         "sizes": "512x512",
         "type": "image/png"
+      },
+      {
+        "src": "/maskable-icon.png",
+        "sizes": "512x512",
+        "type": "image/png",
+        "purpose": "maskable any"
+      }
+    ],
+    "shortcuts": [
+      {
+        "name": "Generate Proposal",
+        "short_name": "Generate",
+        "description": "Create a new client proposal",
+        "url": "/dashboard",
+        "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+      },
+      {
+        "name": "Buy Credits",
+        "short_name": "Buy",
+        "description": "Top up your credits",
+        "url": "/dashboard#buy",
+        "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
       }
     ]
   }
