@@ -6,13 +6,8 @@ html, body {
   margin: 0;
   padding: 0;
   width: 100%;
-  min-height: 100%;
-  font-family: var(--font-sans), sans-serif;
-  background-color: var(--background, #ffffff);
-  color: var(--foreground, #171717);
   overflow-x: hidden;
-}
-
-* {
-  box-sizing: border-box;
+  font-family: sans-serif;
+  background-color: #fff;
+  color: #333;
 }
