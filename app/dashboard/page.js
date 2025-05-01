@@ -134,3 +134,18 @@ Name: ${senderName}, Email: ${senderEmail}, Phone: ${senderPhone}, Website: ${se
     </main>
   )
 }
+<button
+  onClick={() => {
+    if ('caches' in window) {
+      caches.keys().then(function (names) {
+        for (let name of names) caches.delete(name)
+      })
+    }
+    localStorage.clear()
+    sessionStorage.clear()
+    window.location.reload(true)
+  }}
+  className="mt-6 w-full bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 rounded-lg transition"
+>
+  🔄 Clear Browser Cache & Refresh
+</button>
