@@ -1,5 +1,6 @@
 'use client'
-import { useEffect, useState, useRef } from 'react'
+
+import { useState, useRef, useEffect } from 'react'
 import { supabase } from '@/lib/supabaseClient'
 
 export default function Home() {
@@ -15,35 +16,20 @@ export default function Home() {
   const [senderEmail, setSenderEmail] = useState('')
   const [senderPhone, setSenderPhone] = useState('')
   const [senderWebsite, setSenderWebsite] = useState('')
+  const proposalRef = useRef(null)
   const currentYear = new Date().getFullYear()
 
-  const proposalRef = useRef(null)
+  useEffect(() => {
+    setClientName("Example Corp")
+    setInput("Proposal for website redesign and marketing strategy")
+    setYourCompanyName("NexopitchAI Team")
+    setCustomPrice("$3,000")
+    setSenderName("Ibrahim Ruyembe")
+    setSenderEmail("ibrahim@example.com")
+    setSenderPhone("+255 123 456 789")
+    setSenderWebsite("https://nexopitchai.morefestivals.com")
+  }, [])
 
-  useEffect(() => {
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker
-          .register('/service-worker.js')
-          .then((registration) => {
-            console.log('✅ Service Worker registered:', registration);
-          })
-          .catch((err) => {
-            console.log('❌ Service Worker registration failed:', err);
-          });
-      });
-    }
-  }, []);
-  useEffect(() => {
-    setClientName("Example Corp");
-    setInput("Proposal for website redesign and marketing strategy");
-    setYourCompanyName("NexopitchAI Team");
-    setCustomPrice("$3,000");
-    setSenderName("Ibrahim Ruyembe");
-    setSenderEmail("ibrahim@example.com");
-    setSenderPhone("+255 123 456 789");
-    setSenderWebsite("https://nexopitchai.morefestivals.com");
-  }, []);
-  
   const downloadPDF = async () => {
     const element = proposalRef.current
     const html2pdf = (await import('html2pdf.js')).default
@@ -66,18 +52,12 @@ export default function Home() {
       return
     }
 
-    const company = yourCompanyName || 'Our Team'
-    const price = customPrice || '$5,000'
-
     const prompt = `
-      Create a business proposal for ${input} for ${clientName}.
-      Mention it's from ${company}.
-      Use a total price of ${price}.
-      At the end, include this contact info:
-      Name: ${senderName}
-      Email: ${senderEmail}
-      Phone: ${senderPhone}
-      Website: ${senderWebsite || 'N/A'}
+Create a business proposal for ${input} for ${clientName}.
+Mention it's from ${yourCompanyName || 'Our Team'}.
+Use a total price of ${customPrice || '$5,000'}.
+Include contact info:
+Name: ${senderName}, Email: ${senderEmail}, Phone: ${senderPhone}, Website: ${senderWebsite || 'N/A'}
     `
 
     const res = await fetch('/api/generate', {
@@ -87,51 +67,38 @@ export default function Home() {
     })
 
     const data = await res.json()
-    if (res.ok) {
-      setProposal(data.proposal)
-    } else {
-      alert(data.error || 'Something went wrong.')
-    }
+    if (res.ok) setProposal(data.proposal)
+    else alert(data.error || 'Something went wrong.')
 
     setLoading(false)
   }
 
   return (
     <>
-      <main className="w-full max-w-3xl mx-auto px-4 sm:px-6">
+      <main className="w-full max-w-3xl mx-auto px-4 sm:px-6 py-10 text-black dark:text-white">
+        <h1 className="text-2xl font-bold mb-4">NexopitchAI – Smart Proposal Generator</h1>
+        <h2 className="text-lg font-semibold mb-4 text-gray-600 dark:text-gray-300">Choose your plan:</h2>
 
-        <h1 className="text-2xl font-bold mb-4">nexopitchAI – Intelligent Proposal Generator</h1>
-        <h2 className="text-xl font-semibold mb-2">Choose your Plan</h2>
-
-        <div className="flex flex-wrap justify-between w-full">
-
-          <a
-  href="https://stratoelevate.lemonsqueezy.com/buy/dbc3b108-9065-4a48-9898-e93dd559bd39"
-  className="px-4 py-2 bg-primary-600 hover:bg-primary-700 dark:bg-primary-500 dark:hover:bg-primary-600 text-white rounded text-center"
-  target="_blank"
-  rel="noopener noreferrer"
->
-  Buy 10 Credits – $2
-</a>
-<a
-  href="https://stratoelevate.lemonsqueezy.com/buy/f299e4ec-511c-4a06-9bea-be5764b09a4d"
-  className="px-4 py-2 bg-secondary-600 hover:bg-secondary-700 dark:bg-secondary-500 dark:hover:bg-secondary-600 text-white rounded text-center"
-  target="_blank"
-  rel="noopener noreferrer"
->
-  Go Unlimited – $6/Month
-</a>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
+          <a href="https://stratoelevate.lemonsqueezy.com/buy/dbc3b108-9065-4a48-9898-e93dd559bd39" target="_blank" rel="noreferrer"
+            className="bg-blue-600 hover:bg-blue-700 text-white text-center py-3 px-5 rounded-lg font-semibold transition">
+            Buy 10 Credits – $2
+          </a>
+          <a href="https://stratoelevate.lemonsqueezy.com/buy/f299e4ec-511c-4a06-9bea-be5764b09a4d" target="_blank" rel="noreferrer"
+            className="bg-green-600 hover:bg-green-700 text-white text-center py-3 px-5 rounded-lg font-semibold transition">
+            Go Unlimited – $6/Month
+          </a>
         </div>
 
-        <div className="mt-6 space-y-4">
-          <input type="text" value={clientName} onChange={e => setClientName(e.target.value)} placeholder="Enter client or company name" className="w-full p-3 border rounded bg-white dark:bg-gray-800 text-black dark:text-white" />
-          <input type="text" value={yourCompanyName} onChange={e => setYourCompanyName(e.target.value)} placeholder="Your Company Name" className="w-full p-3 border rounded bg-white dark:bg-gray-800 text-black dark:text-white" />
-          <input type="text" value={customPrice} onChange={e => setCustomPrice(e.target.value)} placeholder="Custom Price (e.g. $3,000)" className="w-full p-3 border rounded bg-white dark:bg-gray-800 text-black dark:text-white" />
+        <div className="bg-white dark:bg-gray-900 p-6 rounded-lg shadow space-y-4">
+          <input type="text" placeholder="Client or Project Name" value={clientName} onChange={e => setClientName(e.target.value)} className="w-full p-3 border rounded bg-gray-50 dark:bg-gray-800" />
+          <input type="text" placeholder="Your Company Name" value={yourCompanyName} onChange={e => setYourCompanyName(e.target.value)} className="w-full p-3 border rounded bg-gray-50 dark:bg-gray-800" />
+          <input type="text" placeholder="Custom Price" value={customPrice} onChange={e => setCustomPrice(e.target.value)} className="w-full p-3 border rounded bg-gray-50 dark:bg-gray-800" />
 
           <div>
             <label className="block text-sm font-medium mb-1">Upload Logo</label>
-            <div className="flex items-center space-x-4">
-              <label className="px-4 py-2 bg-primary-600 text-white rounded cursor-pointer">
+            <div className="flex items-center gap-3">
+              <label className="bg-primary-600 text-white py-2 px-4 rounded cursor-pointer">
                 Choose File
                 <input type="file" accept="image/*" className="hidden" onChange={(e) => {
                   const file = e.target.files[0]
@@ -141,56 +108,46 @@ export default function Home() {
                   }
                 }} />
               </label>
-              <span className="text-sm text-gray-600 dark:text-gray-300">
-                {logo ? logo.name : 'No file chosen'}
-              </span>
+              <span className="text-sm">{logo ? logo.name : 'No file chosen'}</span>
             </div>
           </div>
 
-          {logoPreview && (
-            <img src={logoPreview} alt="Uploaded Logo" className="mb-4 h-20 object-contain" />
-          )}
+          {logoPreview && <img src={logoPreview} alt="Uploaded Logo" className="h-16 mb-2 object-contain" />}
 
-          <input type="text" value={senderName} onChange={e => setSenderName(e.target.value)} placeholder="Your Name" className="w-full p-3 border rounded bg-white dark:bg-gray-800 text-black dark:text-white" />
-          <input type="email" value={senderEmail} onChange={e => setSenderEmail(e.target.value)} placeholder="Your Email" className="w-full p-3 border rounded bg-white dark:bg-gray-800 text-black dark:text-white" />
-          <input type="tel" value={senderPhone} onChange={e => setSenderPhone(e.target.value)} placeholder="Phone Number" className="w-full p-3 border rounded bg-white dark:bg-gray-800 text-black dark:text-white" />
-          <input type="text" value={senderWebsite} onChange={e => setSenderWebsite(e.target.value)} placeholder="Website (optional)" className="w-full p-3 border rounded bg-white dark:bg-gray-800 text-black dark:text-white" />
-          <textarea value={input} onChange={e => setInput(e.target.value)} placeholder="e.g. Proposal for social media marketing for a gym in LA" className="w-full h-24 p-3 border rounded bg-white dark:bg-gray-800 text-black dark:text-white" />
+          <input type="text" placeholder="Your Name" value={senderName} onChange={e => setSenderName(e.target.value)} className="w-full p-3 border rounded bg-gray-50 dark:bg-gray-800" />
+          <input type="email" placeholder="Your Email" value={senderEmail} onChange={e => setSenderEmail(e.target.value)} className="w-full p-3 border rounded bg-gray-50 dark:bg-gray-800" />
+          <input type="tel" placeholder="Phone Number" value={senderPhone} onChange={e => setSenderPhone(e.target.value)} className="w-full p-3 border rounded bg-gray-50 dark:bg-gray-800" />
+          <input type="text" placeholder="Website (optional)" value={senderWebsite} onChange={e => setSenderWebsite(e.target.value)} className="w-full p-3 border rounded bg-gray-50 dark:bg-gray-800" />
+          <textarea placeholder="Proposal details..." value={input} onChange={e => setInput(e.target.value)} className="w-full p-3 border rounded bg-gray-50 dark:bg-gray-800 h-28" />
 
-          <button onClick={generateProposal} disabled={loading} className="w-full px-4 py-2 bg-primary-600 dark:bg-primary-500 text-white rounded hover:bg-primary-700 dark:hover:bg-primary-600">
+          <button
+            onClick={generateProposal}
+            disabled={loading}
+            className="w-full bg-primary-600 hover:bg-primary-700 text-white font-bold py-3 px-5 rounded-lg transition"
+          >
             {loading ? 'Generating...' : 'Generate Proposal'}
           </button>
         </div>
 
         {proposal && (
-          <div className="mt-6 bg-gray-50 dark:bg-gray-800 p-4 rounded border border-gray-300 dark:border-gray-600" ref={proposalRef}>
-            {logoPreview && (
-              <img src={logoPreview} alt="Logo" className="h-16 mb-4" />
-            )}
+          <div className="mt-8 bg-gray-50 dark:bg-gray-800 p-6 rounded shadow" ref={proposalRef}>
+            {logoPreview && <img src={logoPreview} alt="Logo" className="h-16 mb-4" />}
             <pre className="whitespace-pre-wrap font-sans text-black dark:text-white">{proposal}</pre>
 
-            <div className="flex gap-4 mt-4">
-            <button
-  onClick={downloadPDF}
-  className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded dark:bg-green-500 dark:hover:bg-green-600"
->
-  Download PDF
-</button>
-<button
-  onClick={generateProposal}
-  className="bg-gray-300 hover:bg-gray-400 text-black px-4 py-2 rounded dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white"
->
-  Regenerate
-</button>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">
+              <button onClick={downloadPDF} className="bg-green-600 hover:bg-green-700 text-white py-3 px-5 rounded transition font-semibold">
+                Download PDF
+              </button>
+              <button onClick={generateProposal} className="bg-gray-300 hover:bg-gray-400 text-black py-3 px-5 rounded transition font-semibold dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white">
+                Regenerate
+              </button>
             </div>
           </div>
         )}
       </main>
 
-      <footer>
-        <p className="text-sm text-secondary-600 dark:text-secondary-400 text-center mt-10">
-          © {currentYear} nexopitchAI. All rights reserved.
-        </p>
+      <footer className="text-sm text-center text-secondary-600 dark:text-secondary-400 mt-10">
+        © {currentYear} NexopitchAI. All rights reserved.
       </footer>
     </>
   )
