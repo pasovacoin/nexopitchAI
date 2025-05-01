@@ -1,15 +1,15 @@
-import { Geist, Geist_Mono } from "next/font/google";
-import './globals.css';
+import './globals.css'
+import { Geist, Geist_Mono } from "next/font/google"
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
-});
+})
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
-});
+})
 
 export const metadata = {
   title: 'NexopitchAI – Smart Business Proposal Generator',
@@ -36,7 +36,7 @@ export const metadata = {
     description: 'Generate smart, professional proposals with AI in seconds.',
     images: ['/og-image.png'],
   },
-};
+}
 
 export default function RootLayout({ children }) {
   return (
@@ -50,7 +50,13 @@ export default function RootLayout({ children }) {
         <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
         <link rel="manifest" href="/manifest.json" />
       </head>
-      <body className={`${geistSans.variable} ${geistMono.variable}`}>{children}</body>
+      <body
+        className={`bg-white dark:bg-gray-900 text-black dark:text-white ${geistSans.variable} ${geistMono.variable}`}
+      >
+        <main className="min-h-screen max-w-3xl mx-auto px-4 py-10">
+          {children}
+        </main>
+      </body>
     </html>
-  );
+  )
 }
