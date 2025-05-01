@@ -117,6 +117,21 @@ Name: ${senderName}, Email: ${senderEmail}, Phone: ${senderPhone}, Website: ${se
           {loading ? 'Generating...' : 'Generate Proposal'}
         </button>
       </div>
+      <button
+  onClick={() => {
+    if ('caches' in window) {
+      caches.keys().then(function (names) {
+        for (let name of names) caches.delete(name)
+      })
+    }
+    localStorage.clear()
+    sessionStorage.clear()
+    window.location.reload(true)
+  }}
+  className="mt-6 w-full bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 rounded-lg transition"
+>
+  🔄 Clear Browser Cache & Refresh
+</button>
 
       {proposal && (
         <div ref={proposalRef} className="mt-6 bg-gray-100 dark:bg-gray-800 p-6 rounded shadow">
@@ -134,18 +149,3 @@ Name: ${senderName}, Email: ${senderEmail}, Phone: ${senderPhone}, Website: ${se
     </main>
   )
 }
-<button
-  onClick={() => {
-    if ('caches' in window) {
-      caches.keys().then(function (names) {
-        for (let name of names) caches.delete(name)
-      })
-    }
-    localStorage.clear()
-    sessionStorage.clear()
-    window.location.reload(true)
-  }}
-  className="mt-6 w-full bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 rounded-lg transition"
->
-  🔄 Clear Browser Cache & Refresh
-</button>
